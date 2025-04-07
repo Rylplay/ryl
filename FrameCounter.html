@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Counting Number with Progress Bar</title>
+<style>
+body {
+  display: flex;
+  flex-direction: column; /* Stack elements vertically */
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  background-color: black;
+  font-family: 'Courier New', monospace;
+}
+
+#number {
+  font-size: 20em;
+  color: white;
+  font-weight: bold;
+}
+
+#progress-bar {
+  width: 80%; /* Adjust width as needed */
+  height: 20px;
+  background-color: #333;
+  margin-top: 50px; /* Add space between number and progress bar */
+  border-radius: 10px;
+  position: absolute; /* Position at the bottom */
+  bottom: 20px; /* Distance from the bottom */
+}
+
+#progress {
+  width: 0%;
+  height: 100%;
+  background-color: #007bff;
+  border-radius: 10px;
+  transition: width 0.1s linear; /* Smooth progress bar animation */
+}
+</style>
+</head>
+<body>
+
+<div id="number">0</div>
+<div id="progress-bar">
+  <div id="progress"></div>
+</div>
+
+<script>
+let numberElement = document.getElementById('number');
+let progressElement = document.getElementById('progress');
+let count = 0;
+let progressWidth = 0;
+const resetInterval = 1000; // Reset interval in milliseconds
+
+function updateNumber() {
+  numberElement.textContent = count;
+  count++;
+  progressWidth = (count / (resetInterval / 16.66)) * 100; // Calculate progress percentage
+
+  if (progressWidth >= 100) {
+    progressWidth = 0;
+    count = 0;
+    numberElement.textContent = count;
+  }
+  progressElement.style.width = progressWidth + '%';
+}
+
+setInterval(updateNumber, 16.66);
+</script>
+
+</body>
+</html>
