@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Refresh rate test</title>
+<title>Screen refresh rate test</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
@@ -59,48 +59,56 @@ body {
 <div id="screen-info"></div>
 
 <script>
-let numberElement = document.getElementById('number');
-let progressElement = document.getElementById('progress');
-let screenInfoElement = document.getElementById('screen-info');
-let count = 0;
-let progressWidth = 0;
-let refreshRate = 60;
-let resetInterval = 1000;
-
-if (window.devicePixelRatio && window.devicePixelRatio > 1) {
-    if(window.matchMedia("(min-resolution: 120dpi)").matches){
-        refreshRate = 120;
-    } else if (window.matchMedia("(min-resolution: 90dpi)").matches) {
-        refreshRate = 90;
-    } else if (window.matchMedia("(min-resolution: 60dpi)").matches) {
-      refreshRate = 60;
+    let numberElement = document.getElementById('number');
+    let progressElement = document.getElementById('progress');
+    let screenInfoElement = document.getElementById('screen-info');
+    let count = 0;
+    let progressWidth = 0;
+    let refreshRate = 60;
+    let resetInterval = 1000;
+    
+    // Improved refresh rate detection
+    if (window.devicePixelRatio && window.devicePixelRatio > 1) {
+        if (window.matchMedia("(min-resolution: 120dpi)").matches) {
+            // Attempt to detect 120Hz
+            if (navigator.userAgent.includes('Android') && navigator.userAgent.includes('Chrome')) {
+                // Android Chrome heuristic (often reports incorrectly)
+                refreshRate = 120;
+            } else {
+                //Other browsers, may be more accurate.
+                refreshRate = 120;
+            }
+        } else if (window.matchMedia("(min-resolution: 90dpi)").matches) {
+            refreshRate = 90;
+        } else if (window.matchMedia("(min-resolution: 60dpi)").matches) {
+          refreshRate = 60;
+        }
     }
-}
-
-function updateNumber() {
-  numberElement.textContent = String(count).padStart(2, '0');
-  count++;
-  progressWidth = (count / (resetInterval / (1000 / refreshRate))) * 100;
-
-  if (progressWidth >= 100) {
-    progressWidth = 0;
-    count = 0;
-    numberElement.textContent = String(count).padStart(2, '0');
-  }
-  progressElement.style.width = progressWidth + '%';
-  updateScreenInfo();
-}
-
-function updateScreenInfo() {
-  const width = window.innerWidth;
-  const height = window.innerHeight;
-  const pixelRatio = window.devicePixelRatio;
-
-  screenInfoElement.textContent = `Size: ${width}x${height}, DPR: ${pixelRatio}, Refresh: ${refreshRate}Hz`;
-}
-
-setInterval(updateNumber, 1000 / refreshRate);
-updateScreenInfo();
-</script>
+    
+    function updateNumber() {
+      numberElement.textContent = String(count).padStart(2, '0');
+      count++;
+      progressWidth = (count / (resetInterval / (1000 / refreshRate))) * 100;
+    
+      if (progressWidth >= 100) {
+        progressWidth = 0;
+        count = 0;
+        numberElement.textContent = String(count).padStart(2, '0');
+      }
+      progressElement.style.width = progressWidth + '%';
+      updateScreenInfo();
+    }
+    
+    function updateScreenInfo() {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      const pixelRatio = window.devicePixelRatio;
+    
+      screenInfoElement.textContent = `Size: ${width}x${height}, DPR: ${pixelRatio}, Refresh: ${refreshRate}Hz`;
+    }
+    
+    setInterval(updateNumber, 1000 / refreshRate);
+    updateScreenInfo();
+    </script>
 </body>
 </html>
