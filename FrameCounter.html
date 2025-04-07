@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Counting Number with Progress Bar</title>
+<title>Dynamic Counting Number</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
 <style>
 body {
   display: flex;
-  flex-direction: column; /* Stack elements vertically */
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   height: 100vh;
   margin: 0;
-  background-color: black;
-  font-family: 'Courier New', monospace;
+  background: linear-gradient(to bottom, #1a1a1a, #000000);
+  font-family: 'Archivo Black', monospace;
 }
 
 #number {
@@ -21,53 +24,83 @@ body {
 }
 
 #progress-bar {
-  width: 80%; /* Adjust width as needed */
+  width: 80%;
   height: 20px;
   background-color: #333;
-  margin-top: 50px; /* Add space between number and progress bar */
+  margin-top: 50px;
   border-radius: 10px;
-  position: absolute; /* Position at the bottom */
-  bottom: 20px; /* Distance from the bottom */
+  position: absolute;
+  bottom: 20px;
 }
 
 #progress {
   width: 0%;
   height: 100%;
-  background-color: #007bff;
+  background: linear-gradient(to right, #00ffff, #00bfff);
   border-radius: 10px;
-  transition: width 0.1s linear; /* Smooth progress bar animation */
+  transition: width 0.1s linear;
+}
+
+#screen-info {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  color: white;
+  font-size: 12px;
 }
 </style>
 </head>
 <body>
 
-<div id="number">0</div>
+<div id="number">00</div>
 <div id="progress-bar">
   <div id="progress"></div>
 </div>
+<div id="screen-info"></div>
 
 <script>
 let numberElement = document.getElementById('number');
 let progressElement = document.getElementById('progress');
+let screenInfoElement = document.getElementById('screen-info');
 let count = 0;
 let progressWidth = 0;
-const resetInterval = 1000; // Reset interval in milliseconds
+let refreshRate = 60;
+let resetInterval = 1000;
+
+if (window.devicePixelRatio && window.devicePixelRatio > 1) {
+    if(window.matchMedia("(min-resolution: 120dpi)").matches){
+        refreshRate = 120;
+    } else if (window.matchMedia("(min-resolution: 90dpi)").matches) {
+        refreshRate = 90;
+    } else if (window.matchMedia("(min-resolution: 60dpi)").matches) {
+      refreshRate = 60;
+    }
+}
 
 function updateNumber() {
-  numberElement.textContent = count;
+  numberElement.textContent = String(count).padStart(2, '0');
   count++;
-  progressWidth = (count / (resetInterval / 16.66)) * 100; // Calculate progress percentage
+  progressWidth = (count / (resetInterval / (1000 / refreshRate))) * 100;
 
   if (progressWidth >= 100) {
     progressWidth = 0;
     count = 0;
-    numberElement.textContent = count;
+    numberElement.textContent = String(count).padStart(2, '0');
   }
   progressElement.style.width = progressWidth + '%';
+  updateScreenInfo();
 }
 
-setInterval(updateNumber, 16.66);
-</script>
+function updateScreenInfo() {
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  const pixelRatio = window.devicePixelRatio;
 
+  screenInfoElement.textContent = `Size: ${width}x${height}, DPR: ${pixelRatio}, Refresh: ${refreshRate}Hz`;
+}
+
+setInterval(updateNumber, 1000 / refreshRate);
+updateScreenInfo();
+</script>
 </body>
 </html>
